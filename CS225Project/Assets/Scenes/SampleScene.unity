@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -334,6 +334,8 @@ GameObject:
   - component: {fileID: 838236797}
   - component: {fileID: 838236798}
   - component: {fileID: 838236799}
+  - component: {fileID: 838236801}
+  - component: {fileID: 838236800}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -485,6 +487,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: ec886b01-41f8-4091-9d1a-00f0a30f85ac
     m_ActionName: 'Player/mouseLook[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 838236798}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: OnLeftMousePress
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2fabf4f5-6c5f-4b0b-95e4-efa27ace6040
+    m_ActionName: 'Player/leftMouse[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 838236798}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: OnRightMousePress
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 24ca99fc-c4c2-4dbb-a551-e43eac1ab849
+    m_ActionName: 'Player/rightMouse[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -513,6 +547,11 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 55
+  firstAttack: {fileID: 838236801}
+  secondAttack: {fileID: 838236800}
+  isAttacking: 0
+  isFirstAtttacking: 0
+  isSecondAtttacking: 0
 --- !u!143 &838236799
 CharacterController:
   m_ObjectHideFlags: 0
@@ -539,6 +578,32 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &838236800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838236792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d535ccf0bdc8f2242804a5ec67d185a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pm: {fileID: 838236798}
+--- !u!114 &838236801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838236792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa789cc387e3d5f44a01da2e289f571e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pm: {fileID: 838236798}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
