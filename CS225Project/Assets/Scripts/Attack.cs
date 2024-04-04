@@ -5,6 +5,9 @@ using UnityEngine;
 public class Attack : MonoBehaviour
 {
     public PlayerMovement pm;
+    public float abilityDuration;
+    public float abilityTimer;
+    public bool abilityInUse;
     private void Start()
     {
         pm = FindAnyObjectByType<PlayerMovement>();
@@ -12,14 +15,12 @@ public class Attack : MonoBehaviour
 
     public virtual void StartAttack()
     {
-        FinishAttacking();
+        abilityInUse = true;
     }
 
     public void FinishAttacking()
     {
-        pm.isFirstAtttacking = false;
-        pm.isSecondAtttacking = false;
-        pm.isAttacking = false;
-        pm.currentState = PlayerMovement.state.idle;
+        abilityTimer = 0f;
+        abilityInUse = false;
     }
 }

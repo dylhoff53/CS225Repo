@@ -10,27 +10,45 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 lastInput;
     public state currentState;
     public float speed;
-    public CharacterController controller;
+    //public CharacterController controller;
 
     public float xAxis;
     public float zAxis;
     public Transform Cam;
     private Vector3 rotationTarget;
     private Vector2 mouseLook;
+    public Vector2 dashDirection;
     public LayerMask mask;
     public Attack firstAttack;
     public Attack secondAttack;
-    public bool isAttacking;
-    public bool isFirstAtttacking;
+    public bool isFirstAtttacking = false;
     public bool isSecondAtttacking;
     public int attackCount1;
     public int attackCount2;
+    public bool firstAttackOnCD = false;
+    public bool secondAttackOnCD = false;
+
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float attackCooldown;
+    public float attackTimer;
+
+    public float firstAttackCooldown;
+    public float firstAttackTimer;
+    public float secondAttackCooldown;
+    public float secondAttackTimer;
+    public Transform playerBase;
+
+    public int bulletDamage;
+    public int health;
+    public GameObject deathEffect;
+    public bool isAlive = true;
 
     public enum state
     {
         idle,
         moving,
-        attacking
+        stone
     }
 
     public void UpdateInput(InputAction.CallbackContext context)
@@ -46,10 +64,11 @@ public class PlayerMovement : MonoBehaviour
     public void OnLeftMousePress(InputAction.CallbackContext context)
     {
         attackCount1++;
-        if(isAttacking == false && attackCount1 != 3)
+        if(attackCount1 != 3 && !firstAttackOnCD)
         {
-            isAttacking = true;
+            firstAttackOnCD = true;
             isFirstAtttacking = true;
+            firstAttack.StartAttack();
         }
         if(attackCount1 >= 3)
         {
@@ -60,10 +79,12 @@ public class PlayerMovement : MonoBehaviour
     public void OnRightMousePress(InputAction.CallbackContext context)
     {
         attackCount2++;
-        if (isAttacking == false && attackCount2 != 3)
+        if (attackCount2 != 3 && !secondAttackOnCD)
         {
-            isAttacking = true;
+            secondAttackOnCD = true;
             isSecondAtttacking = true;
+            dashDirection = playerInput;
+            secondAttack.StartAttack();
         }
         if(attackCount2 >= 3)
         {
@@ -84,13 +105,37 @@ public class PlayerMovement : MonoBehaviour
         Vector2 PlayerInputs = new Vector2(playerInput.x, playerInput.y);
         float xAxis = 0f;
         float zAxis = 0f;
+
+        attackTimer += Time.deltaTime;
+        if(attackTimer >= attackCooldown)
+        {
+            Fire();
+            attackTimer = 0f;
+        }
+
+        if (firstAttackOnCD && !isFirstAtttacking)
+        {
+            firstAttackTimer += Time.deltaTime;
+            if(firstAttackTimer >= firstAttackCooldown)
+            {
+                firstAttackTimer = 0f;
+                firstAttackOnCD = false;
+            }
+        } 
+        if (secondAttackOnCD && !isSecondAtttacking)
+        {
+            secondAttackTimer += Time.deltaTime;
+            if (secondAttackTimer >= secondAttackCooldown)
+            {
+                secondAttackTimer = 0f;
+                secondAttackOnCD = false;
+            }
+        }
+
         switch (currentState)
         {
             case (state.idle):
-                if (isAttacking)
-                {
-                    currentState = state.attacking;
-                }else if (playerInput.magnitude > 0)
+                if (playerInput.magnitude > 0)
                 {
                     currentState = state.moving;
                 }
@@ -99,10 +144,8 @@ public class PlayerMovement : MonoBehaviour
                 break;
 
             case (state.moving):
-                if (isAttacking)
-                {
-                    currentState = state.attacking;
-                }else if (playerInput.magnitude == 0)
+                
+                if (playerInput.magnitude == 0)
                 {
                     currentState = state.idle;
                 }
@@ -113,16 +156,19 @@ public class PlayerMovement : MonoBehaviour
 
                 break;
 
-            case (state.attacking):
-                if (isFirstAtttacking)
+            case (state.stone):
+                if (isSecondAtttacking)
                 {
-                    firstAttack.StartAttack();
-                } else if (isSecondAtttacking)
+                    xAxis = dashDirection.x * speed * Time.deltaTime;
+                    zAxis = dashDirection.y * speed * Time.deltaTime;
+                }
+                else
                 {
-                    secondAttack.StartAttack();
+                    currentState = state.idle;
                 }
 
                 break;
+
             default:
 
                 break;
@@ -131,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 movementVector = new Vector3(xAxis, 0, zAxis);
 
-        transform.Translate(movementVector, Space.World);
+        playerBase.transform.Translate(movementVector, Space.World);
     }
 
     public void Aim()
@@ -152,5 +198,31 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 1f);
         }
+    }
+
+    public void Fire()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+    }
+
+    public void GotHit(int damage)
+    {
+        if (isAlive)
+        {
+            health -= damage;
+            if(health <= 0)
+            {
+                PlayerDied();
+            }
+        }
+    }
+
+    public void PlayerDied()
+    {
+        isAlive = false;
+        GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
+        gameObject.SetActive(false);
+        effect.transform.parent = transform.parent;
+        Destroy(effect, 2.0f);
     }
 }
