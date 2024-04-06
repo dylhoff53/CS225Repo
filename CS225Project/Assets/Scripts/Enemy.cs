@@ -36,7 +36,6 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        attackCooldown = 0f;
         currentState = state.idle;
     }
 
@@ -44,17 +43,19 @@ public class Enemy : MonoBehaviour
     {
         currentDistanceApart = Vector3.Distance(transform.position, pm.transform.position);
 
-        StateMachine();
 
         if (!canAttack)
         {
             attackCounter += Time.deltaTime;
-            if(attackCounter >= attackCooldown)
+            if (attackCounter >= attackCooldown)
             {
                 canAttack = true;
                 attackCounter = 0f;
             }
         }
+
+        StateMachine();
+
         
         
     }
@@ -96,7 +97,7 @@ public class Enemy : MonoBehaviour
                 aimDirection.y = 0f;
                 if (aimDirection != Vector3.zero)
                 {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.05f);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.1f);
                 }
                 if (canAttack)
                 {

@@ -10,6 +10,7 @@ public class PlayerBullet : MonoBehaviour
     public GameObject impactEffect;
     public float explosionRadius = 0f;
     public int damage;
+    public bool isEnemyBullet;
 
 
     PlayerBullet()
@@ -40,21 +41,28 @@ public class PlayerBullet : MonoBehaviour
 
         if (explosionRadius > 0f)
         {
-            Explode();
+            //Explode();
         }
         else
         {
-            if (other.tag == "Enemy")
+            if (other.tag == "Enemy" && !isEnemyBullet)
             {
                 Debug.Log("Hit");
                 GameObject effectIns = Instantiate(impactEffect, transform.position, transform.rotation);
                 Destroy(effectIns, 2f);
                 other.GetComponent<Enemy>().Hit(damage);
                 Destroy(gameObject);
+            } else if (other.tag == "Player" && isEnemyBullet)
+            {
+                Debug.Log("Hit");
+                GameObject effectIns = Instantiate(impactEffect, transform.position, transform.rotation);
+                Destroy(effectIns, 2f);
+                other.GetComponent<PlayerMovement>().GotHit(damage);
+                Destroy(gameObject);
             }
         }
     }
-
+    /*
     public void Explode()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
@@ -65,5 +73,5 @@ public class PlayerBullet : MonoBehaviour
                 collider.GetComponent<Enemy>().Hit(damage);
             }
         }
-    }
+    } */
 }

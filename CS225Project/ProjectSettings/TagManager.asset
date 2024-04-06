@@ -16,8 +16,8 @@ TagManager:
   - Player
   - PlayerBullet
   - Ground
-  - 
-  - 
+  - EnemyBullet
+  - Enemy
   - 
   - 
   - 
