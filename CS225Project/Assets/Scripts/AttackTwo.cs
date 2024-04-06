@@ -15,17 +15,11 @@ public class AttackTwo : Attack
         base.StartAttack();
     }
 
-    public void Update()
+
+    public override void FinishAttacking()
     {
-        if (abilityInUse)
-        {
-            abilityTimer += Time.deltaTime;
-            if (abilityTimer >= abilityDuration)
-            {
-                FinishAttacking();
-                pm.isSecondAtttacking = false;
-                pm.speed = originalSpeed;
-            }
-        }
+        pm.speed = originalSpeed;
+        pm.currentState = PlayerMovement.state.idle;
+        base.FinishAttacking();
     }
 }

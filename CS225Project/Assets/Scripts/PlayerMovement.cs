@@ -21,28 +21,21 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask mask;
     public Attack firstAttack;
     public Attack secondAttack;
-    public bool isFirstAtttacking = false;
-    public bool isSecondAtttacking;
     public int attackCount1;
     public int attackCount2;
-    public bool firstAttackOnCD = false;
-    public bool secondAttackOnCD = false;
 
     public GameObject bulletPrefab;
     public Transform firePoint;
     public float attackCooldown;
     public float attackTimer;
 
-    public float firstAttackCooldown;
-    public float firstAttackTimer;
-    public float secondAttackCooldown;
-    public float secondAttackTimer;
     public Transform playerBase;
 
     public int bulletDamage;
     public int health;
     public GameObject deathEffect;
     public bool isAlive = true;
+    public GameObject hitEffect;
 
     public enum state
     {
@@ -64,11 +57,9 @@ public class PlayerMovement : MonoBehaviour
     public void OnLeftMousePress(InputAction.CallbackContext context)
     {
         attackCount1++;
-        if(attackCount1 != 3 && !firstAttackOnCD)
+        if(attackCount1 != 3)
         {
-            firstAttackOnCD = true;
-            isFirstAtttacking = true;
-            firstAttack.StartAttack();
+            firstAttack.AttemptAttack();
         }
         if(attackCount1 >= 3)
         {
@@ -79,12 +70,10 @@ public class PlayerMovement : MonoBehaviour
     public void OnRightMousePress(InputAction.CallbackContext context)
     {
         attackCount2++;
-        if (attackCount2 != 3 && !secondAttackOnCD)
+        if (attackCount2 != 3)
         {
-            secondAttackOnCD = true;
-            isSecondAtttacking = true;
             dashDirection = playerInput;
-            secondAttack.StartAttack();
+            secondAttack.AttemptAttack();
         }
         if(attackCount2 >= 3)
         {
@@ -113,25 +102,6 @@ public class PlayerMovement : MonoBehaviour
             attackTimer = 0f;
         }
 
-        if (firstAttackOnCD && !isFirstAtttacking)
-        {
-            firstAttackTimer += Time.deltaTime;
-            if(firstAttackTimer >= firstAttackCooldown)
-            {
-                firstAttackTimer = 0f;
-                firstAttackOnCD = false;
-            }
-        } 
-        if (secondAttackOnCD && !isSecondAtttacking)
-        {
-            secondAttackTimer += Time.deltaTime;
-            if (secondAttackTimer >= secondAttackCooldown)
-            {
-                secondAttackTimer = 0f;
-                secondAttackOnCD = false;
-            }
-        }
-
         switch (currentState)
         {
             case (state.idle):
@@ -157,15 +127,8 @@ public class PlayerMovement : MonoBehaviour
                 break;
 
             case (state.stone):
-                if (isSecondAtttacking)
-                {
-                    xAxis = dashDirection.x * speed * Time.deltaTime;
-                    zAxis = dashDirection.y * speed * Time.deltaTime;
-                }
-                else
-                {
-                    currentState = state.idle;
-                }
+                xAxis = dashDirection.x * speed * Time.deltaTime;
+                zAxis = dashDirection.y * speed * Time.deltaTime;
 
                 break;
 
@@ -214,6 +177,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 PlayerDied();
             }
+            else
+            {
+                GameObject effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
+                effect.transform.parent = transform.parent;
+                Destroy(effect, 2.0f);
+            }
         }
     }
 
@@ -221,8 +190,9 @@ public class PlayerMovement : MonoBehaviour
     {
         isAlive = false;
         GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
-        gameObject.SetActive(false);
         effect.transform.parent = transform.parent;
         Destroy(effect, 2.0f);
+        gameObject.SetActive(false);
+        SceneMan.died = true;
     }
 }

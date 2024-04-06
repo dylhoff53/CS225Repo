@@ -10,7 +10,6 @@ public class Enemy : MonoBehaviour
     public float attackCounter;
     public bool canAttack = true;
     public int damage;
-    public bool isAggro;
     public PlayerMovement pm;
 
     public NavMeshAgent agent;
@@ -18,26 +17,34 @@ public class Enemy : MonoBehaviour
 
     public float detectionRange;
     public float currentDistanceApart;
+    public Vector3 aimDirection;
+
+    public state currentState;
+
+    [Header("Ranged Enemy Info")]
+    public bool isRangedEnemy;
+    public float rangedAttackRange;
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    public enum state
+    {
+        idle,
+        moving,
+        attacking
+    }
 
     private void Start()
     {
         attackCooldown = 0f;
+        currentState = state.idle;
     }
 
     void Update()
     {
-        currentDistanceApart = Vector3.Distance(this.transform.position, pm.transform.position);
-        if(currentDistanceApart <= detectionRange)
-        {
-            AggroSwap();
-        } else if(isAggro && currentDistanceApart >= detectionRange)
-        {
-            AggroSwap();
-        }
-        if (isAggro)
-        {
-            agent.SetDestination(pm.transform.position);
-        }
+        currentDistanceApart = Vector3.Distance(transform.position, pm.transform.position);
+
+        StateMachine();
 
         if (!canAttack)
         {
@@ -49,8 +56,62 @@ public class Enemy : MonoBehaviour
             }
         }
         
+        
     }
 
+    public void StateMachine()
+    {
+        switch (currentState)
+        {
+            case (state.idle):
+                if (currentDistanceApart <= detectionRange)
+                {
+                    currentState = state.moving;
+                }
+
+                break;
+
+            case (state.moving):
+
+                if (currentDistanceApart > detectionRange)
+                {
+                    currentState = state.idle;
+                } else if(currentDistanceApart <= rangedAttackRange && isRangedEnemy)
+                {
+                    currentState = state.attacking;
+                }
+                agent.SetDestination(pm.transform.position);
+
+                break;
+
+            case (state.attacking):
+                if(currentDistanceApart > rangedAttackRange)
+                {
+                    currentState = state.moving;
+                }
+                var lookPos = pm.transform.position - transform.position;
+                lookPos.y = 0;
+                var rotation = Quaternion.LookRotation(lookPos);
+                aimDirection = pm.transform.position;
+                aimDirection.y = 0f;
+                if (aimDirection != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.05f);
+                }
+                if (canAttack)
+                {
+                    canAttack = false;
+                    Fire();
+                }
+
+
+                break;
+
+            default:
+
+                break;
+        }
+    }
     public void Hit(int damage)
     {
         health -= damage;
@@ -60,6 +121,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void Fire()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+    }
+
     public void Death()
     {
         GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
@@ -67,19 +133,20 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void AggroSwap()
-    {
-        isAggro = !isAggro;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        AttackCheck(other);
+        if (!isRangedEnemy)
+        {
+            AttackCheck(other);
+        }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        AttackCheck(other);
+        if (!isRangedEnemy)
+        {
+            AttackCheck(other);
+        }
     }
 
 

@@ -14,18 +14,10 @@ public class AttackOne : Attack
         base.StartAttack();
     }
 
-    public void Update()
+
+    public override void FinishAttacking()
     {
-        if (abilityInUse)
-        {
-            abilityTimer += Time.deltaTime;
-            if(abilityTimer >= abilityDuration)
-            {
-                FinishAttacking();
-                pm.attackCooldown = orginialCD;
-                pm.isFirstAtttacking = false;
-                pm.currentState = PlayerMovement.state.stone;
-            }
-        }
+        pm.attackCooldown = orginialCD;
+        base.FinishAttacking();
     }
 }

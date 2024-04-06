@@ -11,7 +11,6 @@ public class EnemyDetector : MonoBehaviour
         if(other.tag == "Player")
         {
             Debug.Log("Player Found!");
-            enemy.isAggro = true;
         }
     }
 
@@ -20,7 +19,6 @@ public class EnemyDetector : MonoBehaviour
         if(other.tag == "Player")
         {
             Debug.Log("Player Lost!");
-            enemy.isAggro = false;
         }
     }
 }
