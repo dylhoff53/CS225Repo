@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour
+public class EnemyBoss : MonoBehaviour
 {
     public int health;
     public float attackCooldown;
@@ -21,30 +21,26 @@ public class Enemy : MonoBehaviour
 
     public state currentState;
 
-    public Barrier myBarrier;
-
     [Header("Ranged Enemy Info")]
-    public bool isRangedEnemy;
-    public float rangedAttackRange;
     public GameObject bulletPrefab;
     public Transform firePoint;
 
     public enum state
     {
-        idle,
         moving,
-        attacking
+        still,
+        charging,
+        
     }
 
     private void Start()
     {
-        currentState = state.idle;
+        currentState = state.moving;
     }
 
     void Update()
     {
         currentDistanceApart = Vector3.Distance(transform.position, pm.transform.position);
-
 
         if (!canAttack)
         {
@@ -58,40 +54,21 @@ public class Enemy : MonoBehaviour
 
         StateMachine();
 
-        
-        
+
+
     }
 
     public void StateMachine()
     {
         switch (currentState)
         {
-            case (state.idle):
-                if (currentDistanceApart <= detectionRange)
-                {
-                    currentState = state.moving;
-                }
-
-                break;
 
             case (state.moving):
-
-                if (currentDistanceApart > detectionRange)
-                {
-                    currentState = state.idle;
-                } else if(currentDistanceApart <= rangedAttackRange && isRangedEnemy)
-                {
-                    currentState = state.attacking;
-                }
                 agent.SetDestination(pm.transform.position);
-
+                TryShoot();
                 break;
 
-            case (state.attacking):
-                if(currentDistanceApart > rangedAttackRange)
-                {
-                    currentState = state.moving;
-                }
+            case (state.charging):
                 var lookPos = pm.transform.position - transform.position;
                 lookPos.y = 0;
                 var rotation = Quaternion.LookRotation(lookPos);
@@ -118,7 +95,7 @@ public class Enemy : MonoBehaviour
     public void Hit(int damage)
     {
         health -= damage;
-        if(health <= 0)
+        if (health <= 0)
         {
             Death();
         }
@@ -133,27 +110,48 @@ public class Enemy : MonoBehaviour
     {
         GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
         Destroy(effect, 3f);
-        if(myBarrier != null)
-        {
-            myBarrier.anEnemyDied();
-        }
         Destroy(gameObject);
+    }
+
+    public void TryShoot()
+    {
+        Vector3 localDir = Quaternion.Inverse(transform.rotation) * (pm.transform.position - transform.position);
+
+        bool isForward = localDir.z > 0;
+        bool isRight = localDir.x > 0;
+
+        if (isForward)
+        {
+            Debug.Log("IsForward");
+            Debug.Log(localDir.z);
+        }
+        else
+        {
+            Debug.Log("IsBehind");
+            Debug.Log(localDir.z);
+
+        }
+        if (isRight)
+        {
+            Debug.Log("IsRight");
+            Debug.Log(localDir.x);
+        }
+        else
+        {
+            Debug.Log("IsLeft");
+            Debug.Log(localDir.x);
+
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isRangedEnemy)
-        {
             AttackCheck(other);
-        }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (!isRangedEnemy)
-        {
             AttackCheck(other);
-        }
     }
 
 

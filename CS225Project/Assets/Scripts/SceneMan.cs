@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneMan : MonoBehaviour
 {
-    private bool gameEnded = false;
+    public bool gameEnded = false;
     public static bool died;
-    public static bool win;
+    public bool win;
     public CanvasGroup blue;
     public CanvasGroup red;
     private float alphaCounter = 0;
@@ -47,6 +47,7 @@ public class SceneMan : MonoBehaviour
     public void GoodEnd()
     {
         gameEnded = true;
+        win = true;
         blue.gameObject.SetActive(true);
         Debug.Log("You Win!");
         Invoke("SwitchScene", endingTime);
@@ -54,6 +55,6 @@ public class SceneMan : MonoBehaviour
 
     public void SwitchScene()
     {
-        //SceneManager.LoadScene(0);
+        SceneManager.LoadScene(0);
     }
 }

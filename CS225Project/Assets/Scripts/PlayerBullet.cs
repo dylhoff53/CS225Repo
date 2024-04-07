@@ -59,6 +59,9 @@ public class PlayerBullet : MonoBehaviour
                 Destroy(effectIns, 2f);
                 other.GetComponent<PlayerMovement>().GotHit(damage);
                 Destroy(gameObject);
+            } else if(other.tag == "Wall")
+            {
+                Destroy(gameObject);
             }
         }
     }
