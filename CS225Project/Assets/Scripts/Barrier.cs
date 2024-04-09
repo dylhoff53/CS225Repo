@@ -7,6 +7,8 @@ public class Barrier : MonoBehaviour
 
     public int myEnemyCount;
     public EnemySpawner nextSpawner;
+    public bool isBossBarrier;
+    public EnemyBossSpawner eBS;
 
     public void anEnemyDied()
     {
@@ -14,6 +16,11 @@ public class Barrier : MonoBehaviour
         if(myEnemyCount <= 0)
         {
             Die();
+        } 
+        
+        if(isBossBarrier && myEnemyCount == 1)
+        {
+            eBS.StartSpawningBoss();
         }
     }
 

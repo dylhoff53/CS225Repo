@@ -10,8 +10,6 @@ public class Attack : MonoBehaviour
     public float abilityTimer;
     public bool abilityInUse;
     public float abilityCD;
-    public float percent;
-    public float percent2;
     public Slider uiSlider;
 
     private void Start()
