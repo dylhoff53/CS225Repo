@@ -6,9 +6,17 @@ public class EnemyBossSpawner : MonoBehaviour
 {
     public GameObject boss;
     public bool bossSpawned;
+    public bool started;
+
+    public GameObject alertText;
 
     public void StartSpawningBoss()
     {
+        if (!started)
+        {
+            started = true;
+            alertText.SetActive(true);
+        }
         if (!bossSpawned)
         {
             bossSpawned = true;
@@ -17,6 +25,7 @@ public class EnemyBossSpawner : MonoBehaviour
     }
     public void SpawnBoss()
     {
+        alertText.SetActive(false);
         boss.SetActive(true);
     }
 }

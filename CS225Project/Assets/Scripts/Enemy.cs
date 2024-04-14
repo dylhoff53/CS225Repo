@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour
         currentDistanceApart = Vector3.Distance(transform.position, pm.transform.position);
 
 
-        if (!canAttack)
+        if(!canAttack)
         {
             attackCounter += Time.deltaTime;
             if (attackCounter >= attackCooldown)
