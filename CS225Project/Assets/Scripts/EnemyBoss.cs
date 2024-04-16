@@ -119,6 +119,7 @@ public class EnemyBoss : MonoBehaviour
                         chargingCounter = 0f;
                         isCharging = false;
                         currentState = state.moving;
+                        agent.isStopped = false;
                     }
                     TryShoot();
                 }
@@ -151,6 +152,7 @@ public class EnemyBoss : MonoBehaviour
     public void StateSwap()
     {
         currentState = state.charging;
+        agent.isStopped = true;
     }
 
     public void TryShoot()
